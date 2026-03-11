@@ -3,6 +3,11 @@ SELECT * FROM food_categories;
 SELECT * FROM inventory_items;
 SELECT * FROM donations_log;
 
+select * from User_Master;
+select * from volunteer_skills;
+select * from beneficiary_details;
+select * from training_sessions;
+select * from driver_training;
 
 
 SELECT ii.name, ii.expiry_date
@@ -31,3 +36,24 @@ SELECT ii.name, fc.food_type, ii.expiry_date, DATEDIFF(ii.expiry_date, CURDATE()
 FROM inventory_items ii
 JOIN food_categories fc ON ii.category_id = fc.category_id
 ORDER BY days_to_expiry ASC;
+
+-- volunteers and their skills
+SELECT u.full_name, v.skill_type, v.years_of_experience
+FROM User_Master u
+JOIN volunteer_skills v
+ON u.user_id = v.volunteer_id;
+
+-- drivers and training sessions
+SELECT u.full_name, t.session_name
+FROM driver_training d
+JOIN User_Master u
+ON d.driver_id = u.user_id
+JOIN training_sessions t
+ON d.session_id = t.session_id;
+
+-- poor families
+SELECT u.full_name, b.poverty_score
+FROM beneficiary_details b
+JOIN User_Master u
+ON b.user_id = u.user_id
+WHERE b.poverty_score > 8;
