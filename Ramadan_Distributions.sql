@@ -41,12 +41,12 @@ INSERT INTO warehouses (name, location, max_capacity, current_status, supervisor
 ('Zagazig Warehouse','Zagazig, Sharkia',50000.00,'Open',1),
 ('Abu Hammad Warehouse','Abu Hammad, Sharkia',40000.00,'Open',1),
 ('Minya Al-Qamh Warehouse','Minya Al-Qamh,Sharkia',30000.00,'Open',1),
-('Belbeis Warehouse','Belbeis, Sharkia',20000.00,'Maintenance',1)
+('Belbeis Warehouse','Belbeis, Sharkia',20000.00,'Maintenance',1);
 
-INSERT INTO food_categories (category_id, food_type, required_storage_temperature) VALUES
+INSERT INTO food_categories (food_type, required_storage_temperature) VALUES
 ('Dry Goods','Dry',25.00),
 ('Fresh Goods','Fresh',4.00),
-('Cooked Meals','Cooked',10.00)
+('Cooked Meals','Cooked',10.00);
 
 
 INSERT INTO inventory_items (name, quantity_kg, warehouse_id, category_id, expiry_date) VALUES
@@ -96,7 +96,7 @@ DELIMITER ;
 
 
 create table User_Master (
-user_id int identity(1,1) primary key,
+user_id INT AUTO_INCREMENT PRIMARY KEY,
 full_name varchar(100) not null,
 gender varchar(15) check (gender in ('Male','Female')),
 age int check (age >= 18),
@@ -107,18 +107,12 @@ role varchar(20) check (role in ('Admin','Volunteer','Driver','Beneficiary'))
 
 
 
-create table volunteer_skills (
-skill_id int identity(1,1) primary key,
-volunteer_id int not null,
-skill_type varchar(50) check (skill_type in ('Cooking','Driving','Data Entry','food_distribution','packing')),
-years_of_experience int check (years_of_experience >= 0),
-foreign key (volunteer_id) references User_Master(user_id)
 
-);
+
 
 
 create table beneficiary_details (
-beneficiary_id int identity(1,1) primary key,
+beneficiary_id int AUTO_INCREMENT primary key,
 user_id int not null,
 family_members_count int check (family_members_count > 0),
 poverty_score int check (poverty_score between 1 and 10),
@@ -126,16 +120,16 @@ last_received_date date  not null,
 foreign key (user_id) references User_Master(user_id)
 
 );
-
-
+DROP TABLE beneficiary_details;
 
 create table training_sessions (
-session_id int identity(1,1) primary key,
+session_id int AUTO_INCREMENT primary key,
 session_name varchar(100) not null,
 trainer_name varchar(100) not null,
 session_date date not null
 
 );
+
 
 create table driver_training (
     driver_id int,
@@ -145,47 +139,56 @@ create table driver_training (
     foreign key (session_id)references training_sessions(session_id)
 );
 
-
+DROP TABLE volunteer_skills;
 
 insert into User_Master (full_name, gender, age, phone, address, role)
 values
-('Ahmed Ali','Male',30,'01012345678','Cairo','driver'),
-('Sara Mohamed','Female',26,'01123456789','Giza','volunteer'),
-('Omar Hassan','Male',27,'01234567890','Minya','beneficiary'),
+('Ahmed Ali','Male',30,'01012345674','Cairo','driver'),
+('Sara Mohamed','Female',26,'01123456781','Giza','volunteer'),
+('Omar Hassan','Male',27,'01234567899','Minya','beneficiary'),
 ('Mona Adel','Female',28,'01098765432','Alex','admin'),
-('Mostafa Ali','Male',31,'01012345678','Fayoum','driver'),
+('Mostafa Ali','Male',31,'01012345675','Fayoum','driver'),
 ('Reem Mohamed','Female',20,'01123456789','Giza','volunteer'),
 ('Esraa Hassan','Female',37,'01234567890','Sohag','volunteer'),
-('Mona Mostafa','Female',25,'01098765432','Alex','admin');
+('Mona Mostafa','Female',25,'01098765433','Alex','admin');
+DROP TABLE User_Master;
 
 select * from User_Master;
-
+SET FOREIGN_KEY_CHECKS = 1;
+SET FOREIGN_KEY_CHECKS = 0;
 
 insert into volunteer_skills (volunteer_id, skill_type, years_of_experience)
 values
-(2,'cooking',3),
-(2,'data_entry',2),
-(3,'driving',4),
-(1,'cooking',1),
+(2,'Cooking',3),
+(2,'Data entry',2),
+(3,'Driving',4),
+(1,'Cooking',1),
 (6,'food_distribution',2),
-(4,'cooking',2),
-(4,'data_entry',1),
-(5,'driving',5);
+(4,'Cooking',2),
+(4,'Data entry',1),
+(5,'Driving',5);
 
+DROP TABLE volunteer_skills;
+
+CREATE TABLE volunteer_skills (
+    skill_id INT AUTO_INCREMENT PRIMARY KEY,
+    volunteer_id INT NOT NULL,
+    skill_type VARCHAR(50) CHECK (skill_type IN ('Cooking','Driving','Data Entry','food_distribution','packing')),
+    years_of_experience INT CHECK (years_of_experience >= 0),
+    FOREIGN KEY (volunteer_id) REFERENCES User_Master(user_id)
+);
 select * from volunteer_skills;
 
 
+DELETE FROM beneficiary_details;
 
-insert into beneficiary_details (user_id, family_members_count, poverty_score, last_received_date)
-values
-(3,5,9,'2026-03-01'),
-(4,4,8,'2026-03-03'),
-(5,6,10,'2026-02-25'),
-(6,3,7,'2026-03-02'),
-(7,7,9,'2026-02-28'),
-(8,5,8,'2026-03-04'),
-(1,6,7,'2026-03-05'),
-(2,6,9,'2026-03-01');
+INSERT INTO beneficiary_details (user_id, family_members_count, poverty_score, last_received_date) VALUES
+(3,5,9,DATE_SUB(CURDATE(),INTERVAL 20 DAY)),  
+(4,4,8,DATE_SUB(CURDATE(),INTERVAL 5 DAY)),  
+(5,6,10,DATE_SUB(CURDATE(),INTERVAL 3 DAY)),  
+(6,3,7,DATE_SUB(CURDATE(),INTERVAL 8 DAY)), 
+(7,7,9,DATE_SUB(CURDATE(),INTERVAL 18 DAY)),  
+(8,5,8,DATE_SUB(CURDATE(),INTERVAL 4 DAY)); 
 
 select * from beneficiary_details;
 
@@ -216,7 +219,7 @@ values
 (4,5),
 (5,6);
 
-
+/*
 select * from driver_training;
 
 
@@ -250,11 +253,11 @@ join training_sessions ts
 on dt.session_id = ts.session_id
 where ts.session_name = 'Safety First'
 );
+*/
 
 
 
 
-<<<<<<< HEAD
 
 /*
 CREATE TABLE beneficiary_details (
@@ -293,18 +296,19 @@ CREATE TABLE driver_training (
     CONSTRAINT fk_dt_session FOREIGN KEY (session_id) REFERENCES training_sessions(session_id) ON UPDATE CASCADE ON DELETE CASCADE
 );*/
 =======
+/*
 select u.full_name, b.poverty_score
 from beneficiary_details b
 join User_master u
 on b.user_id = u.user_id
 where b.poverty_score > 8;
+*/
 
 
 
 
 
-
-
+/*
 GO
 CREATE TRIGGER check_beneficiary_date
 on beneficiary_details
@@ -326,4 +330,73 @@ rollback transaction
 end
 
 end
->>>>>>> 6a347e83e4d35a018e110dc75724ce0ee52bf69a
+*/
+
+CREATE TRIGGER trg_beneficiary_15day_rule
+BEFORE UPDATE ON beneficiary_details
+FOR EACH ROW
+BEGIN
+    IF NEW.last_received_date IS NOT NULL
+       AND OLD.last_received_date IS NOT NULL
+       AND DATEDIFF(NEW.last_received_date, OLD.last_received_date) < 15 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Family cannot receive a second box within a 15-day period.';
+    END IF;
+END;
+
+
+
+
+SELECT i.item_id, i.name AS item_name, i.quantity_kg, i.expiry_date, fc.food_type
+FROM inventory_items i
+JOIN warehouses w ON i.warehouse_id = w.id
+JOIN food_categories fc ON i.category_id = fc.category_id
+WHERE w.name = 'Zagazig Warehouse'
+  AND fc.food_type = 'Fresh'
+  AND i.expiry_date <= DATE_ADD(CURDATE(), INTERVAL 2 DAY)
+ORDER BY i.expiry_date ASC;
+
+-- Query 2: Drivers who have NOT completed Safety First training
+SELECT u.user_id, u.full_name, u.phone, u.address
+FROM User_Master u
+WHERE u.role = 'Driver'
+  AND u.user_id NOT IN (
+        SELECT dt.driver_id
+        FROM driver_training dt
+        JOIN training_sessions ts ON dt.session_id = ts.session_id
+        WHERE ts.session_name = 'Safety First'
+  )
+ORDER BY u.full_name;
+
+
+UPDATE User_Master 
+SET address = 'Minya Al-Qamh, Sharkia' 
+WHERE user_id = 3;
+
+UPDATE User_Master 
+SET address = 'Minya Al-Qamh, Sharkia' 
+WHERE user_id = 7;
+-- Query 3: Families in Minya Al-Qamh with poverty_score > 8 who haven't received a box in 15 days
+SELECT u.user_id, u.full_name, u.address, u.phone, bd.family_members_count, bd.poverty_score, bd.last_received_date
+FROM User_Master u
+JOIN beneficiary_details bd ON u.user_id = bd.user_id
+WHERE u.address LIKE '%Minya Al-Qamh%'
+  AND bd.poverty_score > 8
+  AND (bd.last_received_date IS NULL OR bd.last_received_date <= DATE_SUB(CURDATE(), INTERVAL 15 DAY))
+ORDER BY bd.poverty_score DESC;
+
+-- Query 4: Total Cash donation value from Companies vs Individuals
+SELECT org_type, COUNT(*) AS total_donations, SUM(amount_value) AS total_cash_value
+FROM donations_log
+WHERE donation_type = 'Cash'
+  AND org_type IN ('Company','Individual')
+GROUP BY org_type
+ORDER BY total_cash_value DESC;
+
+
+
+
+
+
+
+
