@@ -91,3 +91,199 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+
+
+
+create table User_Master (
+user_id int identity(1,1) primary key,
+full_name varchar(100) not null,
+gender varchar(15) check (gender in ('Male','Female')),
+age int check (age >= 18),
+phone varchar(11) unique,
+address varchar(100) not null,
+role varchar(20) check (role in ('Admin','Volunteer','Driver','Beneficiary'))
+);
+
+
+
+create table volunteer_skills (
+skill_id int identity(1,1) primary key,
+volunteer_id int not null,
+skill_type varchar(50) check (skill_type in ('Cooking','Driving','Data Entry','food_distribution','packing')),
+years_of_experience int check (years_of_experience >= 0),
+foreign key (volunteer_id) references User_Master(user_id)
+
+);
+
+
+create table beneficiary_details (
+beneficiary_id int identity(1,1) primary key,
+user_id int not null,
+family_members_count int check (family_members_count > 0),
+poverty_score int check (poverty_score between 1 and 10),
+last_received_date date  not null,
+foreign key (user_id) references User_Master(user_id)
+
+);
+
+
+
+create table training_sessions (
+session_id int identity(1,1) primary key,
+session_name varchar(100) not null,
+trainer_name varchar(100) not null,
+session_date date not null
+
+);
+
+create table driver_training (
+    driver_id int,
+    session_id int,
+    primary key (driver_id, session_id),
+    foreign key (driver_id)references User_master(user_id),
+    foreign key (session_id)references training_sessions(session_id)
+);
+
+
+
+insert into User_Master (full_name, gender, age, phone, address, role)
+values
+('Ahmed Ali','Male',30,'01012345678','Cairo','driver'),
+('Sara Mohamed','Female',26,'01123456789','Giza','volunteer'),
+('Omar Hassan','Male',27,'01234567890','Minya','beneficiary'),
+('Mona Adel','Female',28,'01098765432','Alex','admin'),
+('Mostafa Ali','Male',31,'01012345678','Fayoum','driver'),
+('Reem Mohamed','Female',20,'01123456789','Giza','volunteer'),
+('Esraa Hassan','Female',37,'01234567890','Sohag','volunteer'),
+('Mona Mostafa','Female',25,'01098765432','Alex','admin');
+
+select * from User_Master;
+
+
+insert into volunteer_skills (volunteer_id, skill_type, years_of_experience)
+values
+(2,'cooking',3),
+(2,'data_entry',2),
+(3,'driving',4),
+(1,'cooking',1),
+(6,'food_distribution',2),
+(4,'cooking',2),
+(4,'data_entry',1),
+(5,'driving',5);
+
+select * from volunteer_skills;
+
+
+
+insert into beneficiary_details (user_id, family_members_count, poverty_score, last_received_date)
+values
+(3,5,9,'2026-03-01'),
+(4,4,8,'2026-03-03'),
+(5,6,10,'2026-02-25'),
+(6,3,7,'2026-03-02'),
+(7,7,9,'2026-02-28'),
+(8,5,8,'2026-03-04'),
+(1,6,7,'2026-03-05'),
+(2,6,9,'2026-03-01');
+
+select * from beneficiary_details;
+
+
+insert into training_sessions (session_name, trainer_name, session_date)
+values
+('safety first','captain ahmed','2026-03-05'),
+('driving basics','captain mohamed','2026-03-10'),
+('vehicle safety','captain ali','2026-03-12'),
+('emergency response','captain hassan','2026-03-14'),
+('route planning','captain mahmoud','2026-03-16'),
+('food handling','captain ibrahim','2026-03-18'),
+('team coordination','captain khaled','2026-03-20'),
+('logistics management','captain sameh','2026-03-22');
+
+select * from training_sessions;
+
+
+
+insert into driver_training (driver_id, session_id)
+values
+(1,1),
+(1,2),
+(2,1),
+(2,3),
+(3,2),
+(3,4),
+(4,5),
+(5,6);
+
+
+select * from driver_training;
+
+
+
+
+select * from User_Master;
+
+
+
+select u.full_name, v.skill_type, v.years_of_experience
+from User_Master u
+join volunteer_skills v
+on u.user_id = v.volunteer_id;
+
+
+
+select user_id, family_members_count
+from beneficiary_details
+order by family_members_count desc;
+
+
+
+
+select u.full_name
+from User_Master u
+where role = 'driver'
+and u.user_id not in (
+select driver_id
+from driver_training dt
+join training_sessions ts
+on dt.session_id = ts.session_id
+where ts.session_name = 'Safety First'
+);
+
+
+
+
+select u.full_name, b.poverty_score
+from beneficiary_details b
+join User_master u
+on b.user_id = u.user_id
+where b.poverty_score > 8;
+
+
+
+
+
+
+
+GO
+CREATE TRIGGER check_beneficiary_date
+on beneficiary_details
+instead of insert
+as
+begin
+
+if exists (
+select *
+from beneficiary_details b
+join inserted i
+on b.user_id = i.user_id
+where datediff(day, b.last_received_date, i.last_received_date) < 15
+)
+
+begin
+print 'family cannot receive another box within 15 days'
+rollback transaction
+end
+
+end
