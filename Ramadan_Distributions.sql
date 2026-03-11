@@ -120,7 +120,6 @@ last_received_date date  not null,
 foreign key (user_id) references User_Master(user_id)
 
 );
-DROP TABLE beneficiary_details;
 
 create table training_sessions (
 session_id int AUTO_INCREMENT primary key,
@@ -139,7 +138,7 @@ create table driver_training (
     foreign key (session_id)references training_sessions(session_id)
 );
 
-DROP TABLE volunteer_skills;
+
 
 insert into User_Master (full_name, gender, age, phone, address, role)
 values
@@ -151,12 +150,21 @@ values
 ('Reem Mohamed','Female',20,'01123456789','Giza','volunteer'),
 ('Esraa Hassan','Female',37,'01234567890','Sohag','volunteer'),
 ('Mona Mostafa','Female',25,'01098765433','Alex','admin');
-DROP TABLE User_Master;
+
 
 select * from User_Master;
 SET FOREIGN_KEY_CHECKS = 1;
 SET FOREIGN_KEY_CHECKS = 0;
 
+
+
+CREATE TABLE volunteer_skills (
+    skill_id INT AUTO_INCREMENT PRIMARY KEY,
+    volunteer_id INT NOT NULL,
+    skill_type VARCHAR(50) CHECK (skill_type IN ('Cooking','Driving','Data Entry','food_distribution','packing')),
+    years_of_experience INT CHECK (years_of_experience >= 0),
+    FOREIGN KEY (volunteer_id) REFERENCES User_Master(user_id)
+);
 insert into volunteer_skills (volunteer_id, skill_type, years_of_experience)
 values
 (2,'Cooking',3),
@@ -170,17 +178,10 @@ values
 
 DROP TABLE volunteer_skills;
 
-CREATE TABLE volunteer_skills (
-    skill_id INT AUTO_INCREMENT PRIMARY KEY,
-    volunteer_id INT NOT NULL,
-    skill_type VARCHAR(50) CHECK (skill_type IN ('Cooking','Driving','Data Entry','food_distribution','packing')),
-    years_of_experience INT CHECK (years_of_experience >= 0),
-    FOREIGN KEY (volunteer_id) REFERENCES User_Master(user_id)
-);
+
 select * from volunteer_skills;
 
 
-DELETE FROM beneficiary_details;
 
 INSERT INTO beneficiary_details (user_id, family_members_count, poverty_score, last_received_date) VALUES
 (3,5,9,DATE_SUB(CURDATE(),INTERVAL 20 DAY)),  
@@ -219,118 +220,27 @@ values
 (4,5),
 (5,6);
 
-/*
-select * from driver_training;
-
-
-
-
-select * from User_Master;
-
-
-
-select u.full_name, v.skill_type, v.years_of_experience
-from User_Master u
-join volunteer_skills v
-on u.user_id = v.volunteer_id;
-
-
-
-select user_id, family_members_count
-from beneficiary_details
-order by family_members_count desc;
-
-
-
-
-select u.full_name
-from User_Master u
-where role = 'driver'
-and u.user_id not in (
-select driver_id
-from driver_training dt
-join training_sessions ts
-on dt.session_id = ts.session_id
-where ts.session_name = 'Safety First'
-);
-*/
 
 
 
 
 
-/*
-CREATE TABLE beneficiary_details (
-    beneficiary_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL UNIQUE,
-    family_members_count TINYINT NOT NULL CHECK (family_members_count >= 1),
-    poverty_score TINYINT NOT NULL CHECK (poverty_score BETWEEN 1 AND 10),
-    last_received_date DATE NULL,
-    CONSTRAINT fk_beneficiary_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE
-);
-
-
-CREATE TABLE volunteer_skills (
-    skill_id INT AUTO_INCREMENT PRIMARY KEY,
-    volunteer_id INT NOT NULL,
-    skill_type ENUM('Cooking','Driving','Data Entry') NOT NULL,
-    years_of_experience TINYINT NOT NULL CHECK (years_of_experience >= 0),
-    UNIQUE KEY uq_volunteer_skill (volunteer_id, skill_type),
-    CONSTRAINT fk_skill_volunteer FOREIGN KEY (volunteer_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE
-);
-
-CREATE TABLE training_sessions (
-    session_id INT AUTO_INCREMENT PRIMARY KEY,
-    session_name VARCHAR(150) NOT NULL,
-    trainer_name VARCHAR(150) NOT NULL,
-    session_date DATE NOT NULL
-);
-
-
-
-CREATE TABLE driver_training (
-    driver_id INT NOT NULL,
-    session_id INT NOT NULL,
-    PRIMARY KEY (driver_id, session_id),
-    CONSTRAINT fk_dt_driver FOREIGN KEY (driver_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE,
-    CONSTRAINT fk_dt_session FOREIGN KEY (session_id) REFERENCES training_sessions(session_id) ON UPDATE CASCADE ON DELETE CASCADE
-);*/
-=======
-/*
-select u.full_name, b.poverty_score
-from beneficiary_details b
-join User_master u
-on b.user_id = u.user_id
-where b.poverty_score > 8;
-*/
 
 
 
 
 
-/*
-GO
-CREATE TRIGGER check_beneficiary_date
-on beneficiary_details
-instead of insert
-as
-begin
 
-if exists (
-select *
-from beneficiary_details b
-join inserted i
-on b.user_id = i.user_id
-where datediff(day, b.last_received_date, i.last_received_date) < 15
-)
 
-begin
-print 'family cannot receive another box within 15 days'
-rollback transaction
-end
 
-end
-*/
+
+
+
+
+
+
+
+
 
 CREATE TRIGGER trg_beneficiary_15day_rule
 BEFORE UPDATE ON beneficiary_details

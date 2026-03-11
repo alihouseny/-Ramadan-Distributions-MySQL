@@ -57,3 +57,39 @@ FROM beneficiary_details b
 JOIN User_Master u
 ON b.user_id = u.user_id
 WHERE b.poverty_score > 8;
+
+
+
+
+select u.full_name, v.skill_type, v.years_of_experience
+from User_Master u
+join volunteer_skills v
+on u.user_id = v.volunteer_id;
+
+
+
+select user_id, family_members_count
+from beneficiary_details
+order by family_members_count desc;
+
+
+
+
+select u.full_name
+from User_Master u
+where role = 'driver'
+and u.user_id not in (
+select driver_id
+from driver_training dt
+join training_sessions ts
+on dt.session_id = ts.session_id
+where ts.session_name = 'Safety First'
+);
+*/
+
+
+select u.full_name, b.poverty_score
+from beneficiary_details b
+join User_master u
+on b.user_id = u.user_id
+where b.poverty_score > 8;
