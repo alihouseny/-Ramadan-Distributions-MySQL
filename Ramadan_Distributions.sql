@@ -91,3 +91,55 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+
+CREATE TABLE users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    full_name VARCHAR(150) NOT NULL,
+    gender ENUM('Male','Female') NOT NULL,
+    age INT NOT NULL CHECK (age >= 0 AND age <= 120),
+    phone VARCHAR(20) NOT NULL UNIQUE,
+    address VARCHAR(255) NOT NULL,
+    role ENUM('Admin','Volunteer','Driver','Beneficiary') NOT NULL
+);
+
+
+
+
+
+
+CREATE TABLE beneficiary_details (
+    beneficiary_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL UNIQUE,
+    family_members_count TINYINT NOT NULL CHECK (family_members_count >= 1),
+    poverty_score TINYINT NOT NULL CHECK (poverty_score BETWEEN 1 AND 10),
+    last_received_date DATE NULL,
+    CONSTRAINT fk_beneficiary_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+
+CREATE TABLE volunteer_skills (
+    skill_id INT AUTO_INCREMENT PRIMARY KEY,
+    volunteer_id INT NOT NULL,
+    skill_type ENUM('Cooking','Driving','Data Entry') NOT NULL,
+    years_of_experience TINYINT NOT NULL CHECK (years_of_experience >= 0),
+    UNIQUE KEY uq_volunteer_skill (volunteer_id, skill_type),
+    CONSTRAINT fk_skill_volunteer FOREIGN KEY (volunteer_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE TABLE training_sessions (
+    session_id INT AUTO_INCREMENT PRIMARY KEY,
+    session_name VARCHAR(150) NOT NULL,
+    trainer_name VARCHAR(150) NOT NULL,
+    session_date DATE NOT NULL
+);
+
+
+
+CREATE TABLE driver_training (
+    driver_id INT NOT NULL,
+    session_id INT NOT NULL,
+    PRIMARY KEY (driver_id, session_id),
+    CONSTRAINT fk_dt_driver FOREIGN KEY (driver_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT fk_dt_session FOREIGN KEY (session_id) REFERENCES training_sessions(session_id) ON UPDATE CASCADE ON DELETE CASCADE
+);
