@@ -65,7 +65,7 @@ The project includes several SQL queries such as:
 
 The following diagram represents the database design.
 
-![ERD Diagram] (ERD.jpg)
+![ERD Diagram](ERD.jpg)
 
 ---
 
