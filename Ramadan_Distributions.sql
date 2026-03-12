@@ -225,23 +225,6 @@ values
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 CREATE TRIGGER trg_beneficiary_15day_rule
 BEFORE UPDATE ON beneficiary_details
 FOR EACH ROW
@@ -286,6 +269,8 @@ WHERE user_id = 3;
 UPDATE User_Master 
 SET address = 'Minya Al-Qamh, Sharkia' 
 WHERE user_id = 7;
+
+
 -- Query 3: Families in Minya Al-Qamh with poverty_score > 8 who haven't received a box in 15 days
 SELECT u.user_id, u.full_name, u.address, u.phone, bd.family_members_count, bd.poverty_score, bd.last_received_date
 FROM User_Master u
