@@ -73,7 +73,7 @@ from beneficiary_details
 order by family_members_count desc;
 
 
-
+SELECT USER();
 
 select u.full_name
 from User_Master u
